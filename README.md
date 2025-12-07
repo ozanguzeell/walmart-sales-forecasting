@@ -1,3 +1,4 @@
+"""
 🛒 Walmart Satış Tahmini (Final Projesi)
 
 Vehbi Ozan Güzel
@@ -100,3 +101,4 @@ pip install -r requirements.txt
 
 2️⃣ Model tahmini almak için:
 python src/inference.py
+"""
