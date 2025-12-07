@@ -3,7 +3,7 @@ import pandas as pd
 import pickle
 
 # Load Model
-with open('../models/xgboost_model.pkl', 'rb') as f:
+with open('models/xgboost_model.pkl', 'rb') as f:
     model = pickle.load(f)
 
 st.title("🛒 Walmart Sales Forecasting App")
