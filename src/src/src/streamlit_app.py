@@ -6,7 +6,7 @@ import pickle
 with open('../models/xgboost_model.pkl', 'rb') as f:
     model = pickle.load(f)
 
-st.title("📈 Walmart Sales Forecasting App")
+st.title("🛒 Walmart Sales Forecasting App")
 
 st.markdown("Store, Dept ve bazı özellikleri girerek haftalık satış tahmini yapın.")
 
