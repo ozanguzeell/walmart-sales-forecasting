@@ -81,7 +81,6 @@ Model özellikle mevsimsellik ve departman bazlı farkları iyi yakalamıştır
 Bu yaklaşım stok hatalarını azaltabilir ve kârı artırabilir
 
 Sonraki geliştirmelerde kampanya etkisi daha güçlü işlenebilir
-"""
 🧩 Proje Yapısı
 walmart-sales-forecasting/
 ├── README.md
@@ -94,7 +93,6 @@ walmart-sales-forecasting/
 │   └── xgboost_model.pkl
 └── docs/
     └── grafikler
-    """
 
 🚀 Nasıl Çalıştırılır?
 1️⃣ Gerekli kütüphaneleri kurun:
