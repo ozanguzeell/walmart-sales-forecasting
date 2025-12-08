@@ -11,10 +11,7 @@ except FileNotFoundError:
     st.error("Hata: 'models/xgboost_model.pkl' dosyası bulunamadı. Model dosyanızın yolunu kontrol edin.")
     model = None
 
-st.title("🛒 Walmart Sales Forecasting App (19 Özellikli)")
-
-st.markdown("Tahmin için gerekli **tüm 19 özelliği** giriniz. Kategorik veriler (Type) sayısal koda dönüştürülecektir.")
-
+st.title("🛒 Walmart Sales Forecasting App")
 # --- Label Encoding Sözlüğü ---
 # Modelin eğitiminde kullanılan Label Encoding eşleşmesini doğru bildiğinizden emin olun!
 # Varsayım: A=1, B=2, C=3
