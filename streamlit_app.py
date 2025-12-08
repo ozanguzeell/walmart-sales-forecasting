@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import pickle
 import numpy as np
-import datetime
 
 # --- Model Yükleme ---
 try:
@@ -14,11 +13,17 @@ except FileNotFoundError:
 
 st.title("🛒 Walmart Sales Forecasting App (19 Özellikli)")
 
-st.markdown("Tahmin için gerekli **tüm 19 özelliği** giriniz. Verileriniz modelin eğitim sırasına göre düzenlenecektir.")
+st.markdown("Tahmin için gerekli **tüm 19 özelliği** giriniz. Kategorik veriler (Type) sayısal koda dönüştürülecektir.")
+
+# --- Label Encoding Sözlüğü ---
+# Modelin eğitiminde kullanılan Label Encoding eşleşmesini doğru bildiğinizden emin olun!
+# Varsayım: A=1, B=2, C=3
+TYPE_MAPPING = {'A': 1, 'B': 2, 'C': 3}
+
 
 if model is not None:
     
-    # --- 1. Temel Girdiler ---
+    # --- Girdiler (Önceki Koddan) ---
     st.header("Mağaza, Bölüm ve Tarih Bilgileri")
     
     col1, col2, col3 = st.columns(3)
@@ -35,49 +40,32 @@ if model is not None:
     
     with col3:
         isholiday = st.selectbox("IsHoliday?", [0, 1])
-        # Modelin beklediği 'Type' (A, B, C) girdisi.
-        store_type = st.selectbox("Store Type", ['A', 'B', 'C']) 
+        store_type_str = st.selectbox("Store Type (A, B, C)", ['A', 'B', 'C']) 
     
     st.markdown("---")
     
-    # --- 2. Ekonomik ve Çevresel Girdiler ---
-    st.header("Ekonomik ve Çevresel Veriler")
+    # --- Ekonomik, Çevresel ve MarkDown Girdileri (Önceki Koddan) ---
+    st.header("Ekonomik, Çevresel ve MarkDown Girdileri")
     
     col4, col5 = st.columns(2)
     with col4:
         temperature = st.number_input("Temperature (°F)", min_value=-50.0, value=50.0)
         fuel_price = st.number_input("Fuel Price (USD)", min_value=1.0, value=3.0)
+        markdown1 = st.number_input("MarkDown1", min_value=0.0, value=0.0)
+        markdown3 = st.number_input("MarkDown3", min_value=0.0, value=0.0)
+        markdown5 = st.number_input("MarkDown5", min_value=0.0, value=0.0)
+        
     with col5:
         cpi = st.number_input("CPI (Tüketici Fiyat Endeksi)", min_value=100.0, value=180.0)
         unemployment = st.number_input("Unemployment (İşsizlik Oranı)", min_value=0.0, max_value=20.0, value=8.0)
-        
-    st.markdown("---")
-    
-    # --- 3. MarkDown Girdileri ---
-    st.header("MarkDown İndirim Değerleri")
-    st.caption("Genellikle sıfır veya pozitif değerlerdir. Geçerli değilse 0.0 giriniz.")
-    
-    col6, col7, col8, col9, col10 = st.columns(5)
-    
-    with col6:
-        markdown1 = st.number_input("MarkDown1", min_value=0.0, value=0.0)
-    with col7:
         markdown2 = st.number_input("MarkDown2", min_value=0.0, value=0.0)
-    with col8:
-        markdown3 = st.number_input("MarkDown3", min_value=0.0, value=0.0)
-    with col9:
         markdown4 = st.number_input("MarkDown4", min_value=0.0, value=0.0)
-    with col10:
-        markdown5 = st.number_input("MarkDown5", min_value=0.0, value=0.0)
-        
-    # --- Otomatik Tarih Özelliklerini Hesaplama ---
-    # DayOfYear ve Quarter, Week ve Year'dan türetilir.
-    
-    # Basit DayOfYear hesaplaması (haftanın ortasını varsayarak)
+
+    # --- Otomatik Tarih Özelliklerini Hesaplama (Önceki Koddan) ---
     day_of_year = (week * 7) - 3
-    day_of_year = max(1, day_of_year) # 1'den küçük olmasın
+    day_of_year = max(1, day_of_year)
     
-    # Basit Quarter hesaplaması
+    quarter = 0
     if week <= 13:
         quarter = 1
     elif week <= 26:
@@ -87,13 +75,18 @@ if model is not None:
     else:
         quarter = 4
 
-    # --- Veri Çerçevesini Hazırlama (Tüm 19 Özellik) ---
-    # Sütun adları ve sırası modelin eğitim sırasıyla TAM OLARAK AYNI OLMALIDIR.
+    # --- KRİTİK ADIM: Kategorik Veriyi Sayısallaştırma ---
+    # store_type_str ('A', 'B', 'C') değeri TYPE_MAPPING kullanılarak sayısal koda dönüştürülür.
+    store_type_num = TYPE_MAPPING.get(store_type_str, 0) # Eşleşme bulunamazsa 0 kullanılır.
+
+
+    # --- Veri Çerçevesini Hazırlama (Tüm 19 Özellik, Sayısal Tipte) ---
     data_dict = {
+        # Modelin eğitim sırasında beklediği sıraya uyulmuştur.
         'Store': [store],
         'Dept': [dept],
         'IsHoliday': [isholiday],
-        'Type': [store_type], 
+        'Type': [store_type_num], # ARTIK SAYISAL
         'Size': [size],
         'Temperature': [temperature],
         'Fuel_Price': [fuel_price],
@@ -107,8 +100,8 @@ if model is not None:
         'Year': [year],
         'Month': [month],
         'Week': [week],
-        'DayOfYear': [day_of_year], # Hesaplanan
-        'Quarter': [quarter]        # Hesaplanan
+        'DayOfYear': [day_of_year],
+        'Quarter': [quarter]
     }
     
     data = pd.DataFrame(data_dict)
@@ -116,11 +109,9 @@ if model is not None:
     if st.button("Predict Sales"):
         try:
             # Tahmin yapılır
-            # NOT: Orijinal kodunuzda index [1] kullanılmıştı. Tek bir tahmin için [0] kullanılır. 
-            # Eğer modeliniz bir array içinde tek bir değer döndürüyorsa [0] kullanın.
             prediction = model.predict(data)[0]
             st.success(f"📈 Tahmini Haftalık Satış: **${prediction:,.2f}**")
             
-        except ValueError as e:
-            st.error("Tahmin Hatası: Lütfen girdiğiniz tüm 19 özelliğin değerlerini ve modelinizin doğru yüklendiğini kontrol edin.")
+        except Exception as e:
+            st.error("Tahmin yapılırken beklenmedik bir hata oluştu.")
             st.code(f"Hata Detayı: {e}")
