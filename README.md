@@ -99,7 +99,10 @@ Aşağıdaki modeller denenmiştir:
   - Gelir tahminleri iyileştirilebilir
 
 ---
+Streamlit Deploylama Linki:
+https://walmart-sales-forecasting-bdpp4y7sckmpddaewrtmtx.streamlit.app/
 
+---
 ## 🧩 Proje Yapısı
 
 Aşağıdaki yapı önerilmiştir:
