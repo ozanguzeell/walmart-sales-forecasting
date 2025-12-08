@@ -31,5 +31,5 @@ data = pd.DataFrame({
 model.get_booster().feature_names = None
 
 if st.button("Predict Sales"):
-    prediction = model.predict(data)[0]
+    prediction = model.predict(data)[1]
     st.success(f"📈 Tahmini Haftalık Satış: **${prediction:.2f}**")
