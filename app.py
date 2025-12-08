@@ -18,15 +18,10 @@ month = st.number_input("Month", min_value=1, max_value=12)
 week = st.number_input("Week", min_value=1, max_value=52)
 isholiday = st.selectbox("Holiday?", [0, 1])
 
-data = pd.DataFrame({
-    'Store': [store],
-    'Dept': [dept],
-    'Size': [size],
-    'Year': [year],
-    'Month': [month],
-    'Week': [week],
-    'IsHoliday': [isholiday]
-})
+data = pd.DataFrame([[store, dept, size, year, month, week, isholiday]],
+                    columns=['Store', 'Dept', 'Size', 'Year', 'Month', 'Week', 'IsHoliday'])
+prediction = model.predict(data)[0]
+
 
 if st.button("Predict Sales"):
     prediction = model.predict(data)[0]
